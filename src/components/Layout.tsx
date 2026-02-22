@@ -73,9 +73,49 @@ export const Layout = ({ children, onNewOpportunity }: LayoutProps) => {
                 <header className="h-[88px] bg-white/60 backdrop-blur-xl border-b border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center px-8 justify-between shrink-0 sticky top-0 z-20">
                     <div>
                         <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Fırsat Yönetimi</h2>
-                        <p className="text-sm text-slate-500 font-medium">Tüm satış fırsatlarınızı buradan takip edin</p>
+                        <p className="text-sm text-slate-500 font-medium">Satış performansınızı ve hedeflerinizi takip edin</p>
                     </div>
+
+                    {/* Advanced Dashboard Stats */}
                     <div className="flex items-center gap-6">
+
+                        {/* Monthly Goal Progress */}
+                        <div className="hidden lg:flex flex-col gap-1.5 min-w-[160px]">
+                            <div className="flex justify-between text-xs font-bold">
+                                <span className="text-slate-500">Aylık Hedef</span>
+                                <span className="text-primary-600">%{(Math.min((stats.totalWon / 500000) * 100, 100)).toFixed(0)}</span>
+                            </div>
+                            <div className="h-2 w-full bg-slate-200/60 rounded-full overflow-hidden">
+                                <div
+                                    className="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-1000 ease-out"
+                                    style={{ width: `${Math.min((stats.totalWon / 500000) * 100, 100)}%` }}
+                                />
+                            </div>
+                            <div className="text-[10px] text-slate-400 font-medium text-right">Hedef: 500.000 ₺</div>
+                        </div>
+
+                        {/* Conversion Rate */}
+                        <div className="hidden xl:flex items-center gap-3 bg-white/80 px-4 py-2 rounded-xl border border-slate-200/60 shadow-sm">
+                            <div className="w-10 h-10 rounded-full border-[3px] border-slate-100 flex items-center justify-center relative overlow-hidden">
+                                {/* Fake svg circle ring for conversion */}
+                                <svg className="absolute inset-0 w-full h-full -rotate-90">
+                                    <circle cx="17" cy="17" r="15" fill="none" stroke="currentColor" strokeWidth="3" className="text-slate-100" />
+                                    <circle cx="17" cy="17" r="15" fill="none" stroke="currentColor" strokeWidth="3"
+                                        strokeDasharray="94.2"
+                                        strokeDashoffset={94.2 - (94.2 * (stats.totalWon / (stats.totalWon + stats.totalLost || 1)))}
+                                        className="text-primary-500 transition-all duration-1000" />
+                                </svg>
+                                <span className="text-[10px] font-bold text-slate-700">
+                                    {((stats.totalWon / (stats.totalWon + stats.totalLost || 1)) * 100).toFixed(0)}%
+                                </span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Kapanış Oranı</span>
+                                <span className="text-sm font-bold text-slate-700 leading-tight">Başarı</span>
+                            </div>
+                        </div>
+
+                        {/* Existing Won/Lost Stats */}
                         <div className="flex items-center gap-3 bg-white/80 p-1.5 rounded-xl border border-slate-200/60 shadow-sm">
                             <div className="flex flex-col items-end px-3 py-1 bg-emerald-50 rounded-lg border border-emerald-100/50">
                                 <span className="text-[10px] uppercase font-bold text-emerald-600/70 tracking-wider">Kazanılan</span>
@@ -87,7 +127,8 @@ export const Layout = ({ children, onNewOpportunity }: LayoutProps) => {
                                 <span className="text-rose-700 font-bold leading-tight">{stats.totalLost.toLocaleString('tr-TR')} ₺</span>
                             </div>
                         </div>
-                        <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-slate-200 to-slate-100 flex items-center justify-center text-slate-600 font-bold border-2 border-white shadow-md ring-2 ring-slate-100 cursor-pointer hover:ring-primary-400 transition-all">US</div>
+
+                        <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-slate-200 to-slate-100 flex items-center justify-center text-slate-600 font-bold border-2 border-white shadow-md ring-2 ring-slate-100 cursor-pointer hover:ring-primary-400 transition-all shrink-0">US</div>
                     </div>
                 </header>
                 <div className="flex-1 overflow-x-auto overflow-y-auto p-8 custom-scrollbar">

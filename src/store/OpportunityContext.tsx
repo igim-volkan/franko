@@ -15,15 +15,16 @@ export const OpportunityProvider = ({ children }: { children: ReactNode }) => {
     const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
 
     const addOpportunity = (opp: Opportunity) => {
-        setOpportunities(prev => [...prev, opp]);
+        const newOpp = { ...opp, lastUpdatedAt: new Date().toISOString() };
+        setOpportunities(prev => [...prev, newOpp]);
     };
 
     const updateOpportunityStatus = (id: string, status: OpportunityStatus) => {
-        setOpportunities(prev => prev.map(opp => opp.id === id ? { ...opp, status } : opp));
+        setOpportunities(prev => prev.map(opp => opp.id === id ? { ...opp, status, lastUpdatedAt: new Date().toISOString() } : opp));
     };
 
     const updateOpportunity = (id: string, updatedFields: Partial<Opportunity>) => {
-        setOpportunities(prev => prev.map(opp => opp.id === id ? { ...opp, ...updatedFields } : opp));
+        setOpportunities(prev => prev.map(opp => opp.id === id ? { ...opp, ...updatedFields, lastUpdatedAt: new Date().toISOString() } : opp));
     };
 
     return (

@@ -28,6 +28,7 @@ export interface Opportunity {
     id: string;
     customerName: string;
     createdAt: string;
+    lastUpdatedAt?: string;
     name: string;
     contact: ContactPerson;
     trainings: TrainingItem[];
