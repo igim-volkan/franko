@@ -14,6 +14,8 @@ export const NewOpportunityModal = ({ onClose }: NewOpportunityModalProps) => {
     // General
     const [customerName, setCustomerName] = useState('');
     const [createdAt, setCreatedAt] = useState(new Date().toISOString().split('T')[0]);
+    const [targetCloseDate, setTargetCloseDate] = useState('');
+    const [assignee, setAssignee] = useState('');
     const [name, setName] = useState('');
 
     // Contact
@@ -62,6 +64,8 @@ export const NewOpportunityModal = ({ onClose }: NewOpportunityModalProps) => {
             id: uuidv4(),
             customerName,
             createdAt,
+            targetCloseDate,
+            assignee,
             name,
             contact,
             trainings: trainings.map(t => ({ ...t, id: uuidv4(), status: 'pending' as const })),
@@ -104,11 +108,29 @@ export const NewOpportunityModal = ({ onClose }: NewOpportunityModalProps) => {
                                 <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Fırsat Adı</label>
                                 <input required type="text" value={name} onChange={e => setName(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Örn: 2026 Liderlik Eğitimi" />
                             </div>
-                            <div className="md:col-span-2">
-                                <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Oluşturma Tarihi</label>
-                                <div className="relative">
-                                    <Calendar className="absolute left-4 top-3.5 text-slate-400" size={18} />
-                                    <input required type="date" value={createdAt} onChange={e => setCreatedAt(e.target.value)} className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" />
+                            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-5 mt-2">
+                                <div>
+                                    <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Oluşturma Tarihi</label>
+                                    <div className="relative">
+                                        <Calendar className="absolute left-4 top-3.5 text-slate-400" size={18} />
+                                        <input required type="date" value={createdAt} onChange={e => setCreatedAt(e.target.value)} className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Kapanış Hedefi</label>
+                                    <div className="relative">
+                                        <Calendar className="absolute left-4 top-3.5 text-slate-400" size={18} />
+                                        <input type="date" value={targetCloseDate} onChange={e => setTargetCloseDate(e.target.value)} className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Sorumlu Kişi</label>
+                                    <select value={assignee} onChange={e => setAssignee(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none cursor-pointer">
+                                        <option value="">Seçiniz...</option>
+                                        <option value="Uğur Şahin">Uğur Şahin</option>
+                                        <option value="Volkan Ekşi">Volkan Ekşi</option>
+                                        <option value="Diğer">Diğer</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>

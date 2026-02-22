@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { LayoutDashboard, Users, Plus, Settings, UserCircle, LogOut, Moon } from 'lucide-react';
+import { LayoutDashboard, Users, Plus, Settings, UserCircle, LogOut, Moon, BarChart3, CalendarDays } from 'lucide-react';
 import { useOpportunities } from '../store/OpportunityContext';
+
+export type TabType = 'kanban' | 'customers' | 'reports' | 'calendar';
 
 interface LayoutProps {
     children: ReactNode;
     onNewOpportunity: () => void;
+    activeTab: TabType;
+    onTabChange: (tab: TabType) => void;
 }
 
-export const Layout = ({ children, onNewOpportunity }: LayoutProps) => {
+export const Layout = ({ children, onNewOpportunity, activeTab, onTabChange }: LayoutProps) => {
     const { opportunities } = useOpportunities();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
 
@@ -45,17 +49,33 @@ export const Layout = ({ children, onNewOpportunity }: LayoutProps) => {
                 </div>
 
                 <nav className="flex-1 w-full px-4 space-y-1.5">
-                    <button className="flex items-center gap-3 w-full px-4 py-3 bg-white/10 text-white rounded-xl font-medium transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] cursor-pointer">
-                        <LayoutDashboard size={20} className="text-primary-400" />
+                    <button
+                        onClick={() => onTabChange('kanban')}
+                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-medium transition-all cursor-pointer ${activeTab === 'kanban' ? 'bg-white/10 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]' : 'hover:bg-white/5 text-slate-400 hover:text-white group'}`}
+                    >
+                        <LayoutDashboard size={20} className={activeTab === 'kanban' ? 'text-primary-400' : 'group-hover:text-primary-400 transition-colors'} />
                         Satış Panosu
                     </button>
-                    <button className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 text-slate-400 hover:text-white rounded-xl font-medium transition-all group cursor-pointer">
-                        <Users size={20} className="group-hover:text-primary-400 transition-colors" />
+                    <button
+                        onClick={() => onTabChange('customers')}
+                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-medium transition-all cursor-pointer ${activeTab === 'customers' ? 'bg-white/10 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]' : 'hover:bg-white/5 text-slate-400 hover:text-white group'}`}
+                    >
+                        <Users size={20} className={activeTab === 'customers' ? 'text-primary-400' : 'group-hover:text-primary-400 transition-colors'} />
                         Müşteriler
                     </button>
-                    <button className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 text-slate-400 hover:text-white rounded-xl font-medium transition-all group cursor-pointer">
-                        <Settings size={20} className="group-hover:text-primary-400 transition-colors" />
-                        Ayarlar
+                    <button
+                        onClick={() => onTabChange('reports')}
+                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-medium transition-all cursor-pointer ${activeTab === 'reports' ? 'bg-white/10 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]' : 'hover:bg-white/5 text-slate-400 hover:text-white group'}`}
+                    >
+                        <BarChart3 size={20} className={activeTab === 'reports' ? 'text-primary-400' : 'group-hover:text-primary-400 transition-colors'} />
+                        Raporlar
+                    </button>
+                    <button
+                        onClick={() => onTabChange('calendar')}
+                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-medium transition-all cursor-pointer ${activeTab === 'calendar' ? 'bg-white/10 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]' : 'hover:bg-white/5 text-slate-400 hover:text-white group'}`}
+                    >
+                        <CalendarDays size={20} className={activeTab === 'calendar' ? 'text-primary-400' : 'group-hover:text-primary-400 transition-colors'} />
+                        Takvim
                     </button>
                 </nav>
 
@@ -74,8 +94,18 @@ export const Layout = ({ children, onNewOpportunity }: LayoutProps) => {
             <main className="flex-1 flex flex-col h-screen overflow-hidden relative z-10">
                 <header className="h-[88px] bg-white/60 backdrop-blur-xl border-b border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center px-8 justify-between shrink-0 sticky top-0 z-20">
                     <div>
-                        <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Fırsat Yönetimi</h2>
-                        <p className="text-sm text-slate-500 font-medium">Satış performansınızı ve hedeflerinizi takip edin</p>
+                        <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
+                            {activeTab === 'kanban' && 'Fırsat Yönetimi'}
+                            {activeTab === 'customers' && 'Müşteriler'}
+                            {activeTab === 'reports' && 'Raporlar ve Analizler'}
+                            {activeTab === 'calendar' && 'Takvim'}
+                        </h2>
+                        <p className="text-sm text-slate-500 font-medium">
+                            {activeTab === 'kanban' && 'Satış performansınızı ve hedeflerinizi takip edin'}
+                            {activeTab === 'customers' && 'Tüm müşteri portföyünüz ve işlem geçmişiniz'}
+                            {activeTab === 'reports' && 'Satış grafikleri ve periyodik analizler'}
+                            {activeTab === 'calendar' && 'Yaklaşan fırsatlar ve takip takvimi'}
+                        </p>
                     </div>
 
                     {/* Advanced Dashboard Stats */}
