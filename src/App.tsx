@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { OpportunityProvider } from './store/OpportunityContext';
 import { Layout } from './components/Layout';
 import { KanbanBoard } from './components/KanbanBoard';
