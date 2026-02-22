@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useOpportunities } from '../store/OpportunityContext';
-import { Trophy, AlertCircle, Target, Users, TrendingUp } from 'lucide-react';
+import { Trophy, Target, Users, TrendingUp } from 'lucide-react';
 
 export const AnalyticsDashboard = () => {
     const { opportunities } = useOpportunities();
