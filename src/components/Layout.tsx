@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { LayoutDashboard, Users, Plus, Settings } from 'lucide-react';
+import { LayoutDashboard, Users, Plus, Settings, UserCircle, LogOut, Moon } from 'lucide-react';
 import { useOpportunities } from '../store/OpportunityContext';
 
 interface LayoutProps {
@@ -9,6 +10,7 @@ interface LayoutProps {
 
 export const Layout = ({ children, onNewOpportunity }: LayoutProps) => {
     const { opportunities } = useOpportunities();
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
 
     const stats = opportunities
         .filter(opp => opp.status === 'Bitti')
@@ -128,7 +130,51 @@ export const Layout = ({ children, onNewOpportunity }: LayoutProps) => {
                             </div>
                         </div>
 
-                        <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-slate-200 to-slate-100 flex items-center justify-center text-slate-600 font-bold border-2 border-white shadow-md ring-2 ring-slate-100 cursor-pointer hover:ring-primary-400 transition-all shrink-0">US</div>
+                        <div className="relative">
+                            <button
+                                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                                className="w-11 h-11 rounded-full bg-gradient-to-tr from-slate-200 to-slate-100 flex items-center justify-center text-slate-600 font-bold border-2 border-white shadow-md ring-2 ring-slate-100 focus:outline-none hover:ring-primary-400 focus:ring-primary-400 transition-all shrink-0"
+                            >
+                                US
+                            </button>
+
+                            {isProfileOpen && (
+                                <>
+                                    <div className="fixed inset-0 z-10" onClick={() => setIsProfileOpen(false)}></div>
+                                    <div className="absolute right-0 top-full mt-3 w-56 bg-white/95 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-[0_10px_40px_rgb(0,0,0,0.08)] py-2 z-20 animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <div className="px-4 py-3 border-b border-slate-100/80 mb-1">
+                                            <p className="text-sm font-bold text-slate-800">Uğur Şahin</p>
+                                            <p className="text-xs font-medium text-slate-500">ugur@franko.com</p>
+                                        </div>
+                                        <div className="px-2 space-y-1">
+                                            <button className="w-full flex items-center gap-3 px-3 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors">
+                                                <UserCircle size={16} className="text-slate-400" />
+                                                Profilim
+                                            </button>
+                                            <button className="w-full flex items-center gap-3 px-3 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors">
+                                                <Settings size={16} className="text-slate-400" />
+                                                Ayarlar
+                                            </button>
+                                            <button className="w-full flex items-center justify-between px-3 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors">
+                                                <div className="flex items-center gap-3">
+                                                    <Moon size={16} className="text-slate-400" />
+                                                    Koyu Tema
+                                                </div>
+                                                <div className="w-7 h-4 bg-slate-200 rounded-full relative">
+                                                    <div className="w-3 h-3 bg-white rounded-full absolute left-0.5 top-0.5 shadow-sm"></div>
+                                                </div>
+                                            </button>
+                                        </div>
+                                        <div className="mt-1 px-2 pt-1 border-t border-slate-100/80">
+                                            <button className="w-full flex items-center gap-3 px-3 py-2 text-sm font-bold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors">
+                                                <LogOut size={16} />
+                                                Çıkış Yap
+                                            </button>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </header>
                 <div className="flex-1 overflow-x-auto overflow-y-auto p-8 custom-scrollbar">
