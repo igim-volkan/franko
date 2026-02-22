@@ -14,6 +14,7 @@ export const AnalyticsDashboard = () => {
 
         const monthlyStats = new Array(12).fill(0).map(() => ({ won: 0, lost: 0 }));
         const customerMap = new Map();
+        const lossReasonMap = new Map<string, number>();
 
         opportunities.forEach(opp => {
             if (opp.status === 'Bitti') {
@@ -29,6 +30,9 @@ export const AnalyticsDashboard = () => {
                         totalLost += t.amount;
                         lostCount++;
                         monthlyStats[month].lost += t.amount;
+                        if (t.lossReason) {
+                            lossReasonMap.set(t.lossReason, (lossReasonMap.get(t.lossReason) || 0) + 1);
+                        }
                     }
                 });
             } else {
@@ -41,7 +45,11 @@ export const AnalyticsDashboard = () => {
             .slice(0, 5)
             .map(([name, amount]) => ({ name, amount }));
 
-        return { totalWon, totalLost, totalOngoing, wonCount, lostCount, monthlyStats, topCustomers };
+        const lossReasons = Array.from(lossReasonMap.entries())
+            .sort((a, b) => b[1] - a[1])
+            .map(([reason, count]) => ({ reason, count }));
+
+        return { totalWon, totalLost, totalOngoing, wonCount, lostCount, monthlyStats, topCustomers, lossReasons };
     }, [opportunities]);
 
     const MONTHS = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
@@ -122,29 +130,57 @@ export const AnalyticsDashboard = () => {
                     </div>
                 </div>
 
-                {/* Top Customers */}
-                <div className="bg-white/90 backdrop-blur-xl border border-slate-200/60 rounded-[24px] p-6 shadow-sm">
-                    <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                        <Users className="text-primary-500" size={20} /> En İyi 5 Müşteri
-                    </h3>
-                    <div className="space-y-4">
-                        {stats.topCustomers.length === 0 ? (
-                            <p className="text-sm text-slate-400 text-center py-4">Henüz yeterli veri yok.</p>
-                        ) : (
-                            stats.topCustomers.map((customer, index) => (
-                                <div key={customer.name} className="flex items-center gap-4">
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${index === 0 ? 'bg-amber-100 text-amber-600' : index === 1 ? 'bg-slate-200 text-slate-600' : index === 2 ? 'bg-amber-50 text-amber-800/60' : 'bg-slate-50 text-slate-400'}`}>
-                                        {index + 1}
+                {/* Top Customers and Loss Reasons */}
+                <div className="flex flex-col gap-6">
+                    <div className="bg-white/90 backdrop-blur-xl border border-slate-200/60 rounded-[24px] p-6 shadow-sm flex-1">
+                        <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                            <Users className="text-primary-500" size={20} /> En İyi 5 Müşteri
+                        </h3>
+                        <div className="space-y-4">
+                            {stats.topCustomers.length === 0 ? (
+                                <p className="text-sm text-slate-400 text-center py-4">Henüz yeterli veri yok.</p>
+                            ) : (
+                                stats.topCustomers.map((customer, index) => (
+                                    <div key={customer.name} className="flex items-center gap-4">
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${index === 0 ? 'bg-amber-100 text-amber-600' : index === 1 ? 'bg-slate-200 text-slate-600' : index === 2 ? 'bg-amber-50 text-amber-800/60' : 'bg-slate-50 text-slate-400'}`}>
+                                            {index + 1}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-bold text-slate-700 truncate text-sm" title={customer.name}>{customer.name}</p>
+                                        </div>
+                                        <div className="text-sm font-bold text-emerald-600 whitespace-nowrap">
+                                            {customer.amount.toLocaleString('tr-TR')} ₺
+                                        </div>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="font-bold text-slate-700 truncate text-sm" title={customer.name}>{customer.name}</p>
-                                    </div>
-                                    <div className="text-sm font-bold text-emerald-600 whitespace-nowrap">
-                                        {customer.amount.toLocaleString('tr-TR')} ₺
-                                    </div>
-                                </div>
-                            ))
-                        )}
+                                ))
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="bg-white/90 backdrop-blur-xl border border-slate-200/60 rounded-[24px] p-6 shadow-sm flex-1">
+                        <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                            Kaybetme Nedenleri
+                        </h3>
+                        <div className="space-y-4">
+                            {stats.lossReasons.length === 0 ? (
+                                <p className="text-sm text-slate-400 text-center py-4">Kayıp verisi yok.</p>
+                            ) : (
+                                stats.lossReasons.map((item) => {
+                                    const percentage = Math.round((item.count / stats.lostCount) * 100);
+                                    return (
+                                        <div key={item.reason} className="mb-2">
+                                            <div className="flex justify-between text-[13px] font-bold text-slate-600 mb-1.5">
+                                                <span>{item.reason}</span>
+                                                <span className="text-rose-500">{item.count} Kayıp ({percentage}%)</span>
+                                            </div>
+                                            <div className="w-full bg-slate-100 rounded-full h-2">
+                                                <div className="bg-rose-400 h-2 rounded-full" style={{ width: `${percentage}%` }}></div>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

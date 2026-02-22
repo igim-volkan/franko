@@ -14,7 +14,11 @@ export const CloseOpportunityModal = ({ opportunity, onClose }: CloseOpportunity
     const [trainings, setTrainings] = useState(opportunity.trainings.map(t => ({ ...t, status: t.status === 'pending' ? 'won' : t.status })));
 
     const handleStatusChange = (id: string, status: 'won' | 'lost') => {
-        setTrainings(prev => prev.map(t => t.id === id ? { ...t, status } : t));
+        setTrainings(prev => prev.map(t => t.id === id ? { ...t, status, lossReason: status === 'won' ? undefined : t.lossReason } : t));
+    };
+
+    const handleReasonChange = (id: string, reason: string) => {
+        setTrainings(prev => prev.map(t => t.id === id ? { ...t, lossReason: reason } : t));
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -40,29 +44,51 @@ export const CloseOpportunityModal = ({ opportunity, onClose }: CloseOpportunity
                 <form onSubmit={handleSubmit} className="p-6">
                     <div className="space-y-4 max-h-[50vh] overflow-y-auto mb-6 pr-2">
                         {trainings.map(training => (
-                            <div key={training.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-50 p-4 rounded-xl border border-slate-200 gap-4">
-                                <div>
-                                    <h4 className="font-semibold text-slate-800 text-lg">{training.topic} - {training.type}</h4>
-                                    <p className="text-sm text-slate-500 mt-1">{training.amount.toLocaleString('tr-TR')} ₺ | {training.duration}</p>
+                            <React.Fragment key={training.id}>
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-50 p-4 rounded-xl border border-slate-200 gap-4">
+                                    <div>
+                                        <h4 className="font-semibold text-slate-800 text-lg">{training.topic} - {training.type}</h4>
+                                        <p className="text-sm text-slate-500 mt-1">{training.amount.toLocaleString('tr-TR')} ₺ | {training.duration}</p>
+                                    </div>
+
+                                    <div className="flex bg-white rounded-lg p-1.5 border border-slate-200 shadow-sm shrink-0">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleStatusChange(training.id, 'won')}
+                                            className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors cursor-pointer ${training.status === 'won' ? 'bg-emerald-100 text-emerald-700 font-bold' : 'text-slate-500 hover:bg-slate-50'}`}
+                                        >
+                                            <CheckCircle size={20} /> Kazanıldı
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleStatusChange(training.id, 'lost')}
+                                            className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors cursor-pointer ${training.status === 'lost' ? 'bg-red-100 text-red-700 font-bold' : 'text-slate-500 hover:bg-slate-50'}`}
+                                        >
+                                            <XCircle size={20} /> Kaybedildi
+                                        </button>
+                                    </div>
                                 </div>
 
-                                <div className="flex bg-white rounded-lg p-1.5 border border-slate-200 shadow-sm shrink-0">
-                                    <button
-                                        type="button"
-                                        onClick={() => handleStatusChange(training.id, 'won')}
-                                        className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors cursor-pointer ${training.status === 'won' ? 'bg-emerald-100 text-emerald-700 font-bold' : 'text-slate-500 hover:bg-slate-50'}`}
-                                    >
-                                        <CheckCircle size={20} /> Kazanıldı
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleStatusChange(training.id, 'lost')}
-                                        className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors cursor-pointer ${training.status === 'lost' ? 'bg-red-100 text-red-700 font-bold' : 'text-slate-500 hover:bg-slate-50'}`}
-                                    >
-                                        <XCircle size={20} /> Kaybedildi
-                                    </button>
-                                </div>
-                            </div>
+                                {training.status === 'lost' && (
+                                    <div className="mt-2 mb-4 bg-red-50/50 p-4 rounded-xl border border-red-100 flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2">
+                                        <label className="text-sm font-semibold text-red-800 whitespace-nowrap">Kayıp Nedeni:</label>
+                                        <select
+                                            required
+                                            value={training.lossReason || ''}
+                                            onChange={e => handleReasonChange(training.id, e.target.value)}
+                                            className="w-full sm:w-2/3 px-3 py-2 text-sm bg-white border border-red-200 rounded-lg focus:ring-2 focus:ring-red-400 outline-none text-slate-700 font-medium"
+                                        >
+                                            <option value="">Lütfen bir neden seçin...</option>
+                                            <option value="Fiyat Yüksek Geldi">Fiyat Yüksek Geldi</option>
+                                            <option value="Rakibe Gidildi">Rakibe Gidildi</option>
+                                            <option value="Bütçe İptali">Bütçe İptali</option>
+                                            <option value="Zamanlama Uymadı">Zamanlama Uymadı</option>
+                                            <option value="İhtiyaç Değişti">İhtiyaç Değişti</option>
+                                            <option value="Diğer">Diğer</option>
+                                        </select>
+                                    </div>
+                                )}
+                            </React.Fragment>
                         ))}
                     </div>
 

@@ -69,6 +69,8 @@ export const NewOpportunityModal = ({ onClose }: NewOpportunityModalProps) => {
             name,
             contact,
             trainings: trainings.map(t => ({ ...t, id: uuidv4(), status: 'pending' as const })),
+            activities: notes ? [{ id: uuidv4(), date: new Date().toISOString(), content: notes, type: 'note' as const }] : [],
+            tasks: [],
             totalAmount,
             notes,
             status: 'Teklif verildi'

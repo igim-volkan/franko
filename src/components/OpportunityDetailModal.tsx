@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import type { Opportunity } from '../types';
 import { useOpportunities } from '../store/OpportunityContext';
-import { X, User, Phone, Mail, FileText, Calendar, Building, DollarSign, Printer } from 'lucide-react';
+import { X, User, Phone, Mail, FileText, Calendar, Building, DollarSign, Printer, Plus, MessageSquare, CheckSquare, Square, Trash2 } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 
 interface OpportunityDetailModalProps {
     opportunity: Opportunity;
@@ -17,15 +18,67 @@ export const OpportunityDetailModal = ({ opportunity, onClose }: OpportunityDeta
     const [contact, setContact] = useState(opportunity.contact);
     const [targetCloseDate, setTargetCloseDate] = useState(opportunity.targetCloseDate || '');
     const [assignee, setAssignee] = useState(opportunity.assignee || '');
+    const [activities, setActivities] = useState(opportunity.activities || []);
+    const [tasks, setTasks] = useState(opportunity.tasks || []);
+
+    // New Activity State
+    const [newActivityContent, setNewActivityContent] = useState('');
+    const [newActivityType, setNewActivityType] = useState<'note' | 'email' | 'call' | 'meeting'>('note');
+
+    // New Task State
+    const [newTaskTitle, setNewTaskTitle] = useState('');
 
     const handleSave = () => {
         updateOpportunity(opportunity.id, {
             notes,
             contact,
             targetCloseDate,
-            assignee
+            assignee,
+            activities,
+            tasks
         });
         setIsEditing(false);
+    };
+
+    const handleAddActivity = () => {
+        if (!newActivityContent.trim()) return;
+
+        const newAct = {
+            id: uuidv4(),
+            date: new Date().toISOString(),
+            content: newActivityContent,
+            type: newActivityType
+        };
+
+        const updatedActivities = [newAct, ...activities].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        setActivities(updatedActivities);
+        setNewActivityContent('');
+
+        // Auto-save just activities
+        updateOpportunity(opportunity.id, {
+            activities: updatedActivities
+        });
+    };
+
+    const handleAddTask = () => {
+        if (!newTaskTitle.trim()) return;
+        const newTask = { id: uuidv4(), title: newTaskTitle, isCompleted: false };
+        const updatedTasks = [...tasks, newTask];
+        setTasks(updatedTasks);
+        setNewTaskTitle('');
+        updateOpportunity(opportunity.id, { tasks: updatedTasks });
+    };
+
+    const toggleTask = (taskId: string) => {
+        const updatedTasks = tasks.map(t => t.id === taskId ? { ...t, isCompleted: !t.isCompleted } : t);
+        setTasks(updatedTasks);
+        updateOpportunity(opportunity.id, { tasks: updatedTasks });
+    };
+
+    const deleteTask = (taskId: string) => {
+        const updatedTasks = tasks.filter(t => t.id !== taskId);
+        setTasks(updatedTasks);
+        updateOpportunity(opportunity.id, { tasks: updatedTasks });
     };
 
     const handlePrint = () => {
@@ -196,29 +249,129 @@ export const OpportunityDetailModal = ({ opportunity, onClose }: OpportunityDeta
                         </div>
                     </section>
 
-                    {/* Notes */}
-                    <section className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                <FileText className="text-primary-500" size={20} /> Notlar ve Görüşmeler
-                            </h3>
-                            {!isEditing && (
-                                <button onClick={() => setIsEditing(true)} className="text-sm font-semibold text-primary-600 hover:text-primary-700">Düzenle</button>
+                    {/* Tasks (Yapılacaklar) */}
+                    <section className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm print:hidden">
+                        <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <CheckSquare className="text-primary-500" size={20} /> Yapılacaklar
+                        </h3>
+
+                        <div className="space-y-2 mb-4">
+                            {tasks.map(task => (
+                                <div key={task.id} className="flex items-center justify-between group p-2 hover:bg-slate-50 rounded-lg transition-colors border border-transparent hover:border-slate-100">
+                                    <div className="flex items-center gap-3 cursor-pointer" onClick={() => toggleTask(task.id)}>
+                                        <div className={`text-slate-400 group-hover:text-primary-500 transition-colors ${task.isCompleted ? 'text-primary-500' : ''}`}>
+                                            {task.isCompleted ? <CheckSquare size={18} /> : <Square size={18} />}
+                                        </div>
+                                        <span className={`text-sm font-medium ${task.isCompleted ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
+                                            {task.title}
+                                        </span>
+                                    </div>
+                                    <button onClick={() => deleteTask(task.id)} className="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1">
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
+                            ))}
+                            {tasks.length === 0 && (
+                                <p className="text-sm text-slate-400 italic px-2">Henüz görev eklenmemiş.</p>
                             )}
                         </div>
 
-                        {isEditing ? (
-                            <textarea
-                                value={notes}
-                                onChange={e => setNotes(e.target.value)}
-                                className="w-full min-h-[120px] p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none text-sm resize-y"
-                                placeholder="Görüşme notları, toplantı özetleri..."
+                        <div className="flex items-center gap-2 mt-2">
+                            <input
+                                type="text"
+                                value={newTaskTitle}
+                                onChange={e => setNewTaskTitle(e.target.value)}
+                                onKeyDown={e => e.key === 'Enter' && handleAddTask()}
+                                placeholder="Yeni bir görev ekle..."
+                                className="flex-1 px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
                             />
-                        ) : (
-                            <div className="text-sm text-slate-600 whitespace-pre-wrap bg-slate-50 p-4 rounded-xl border border-slate-100 min-h-[80px]">
-                                {opportunity.notes || <span className="italic text-slate-400">Henüz not eklenmemiş.</span>}
+                            <button onClick={handleAddTask} disabled={!newTaskTitle.trim()} className="p-2 bg-slate-800 text-white rounded-lg hover:bg-slate-900 disabled:opacity-50 transition-colors">
+                                <Plus size={18} />
+                            </button>
+                        </div>
+                    </section>
+
+                    {/* Timeline & Activities */}
+                    <section className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm print:hidden">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <MessageSquare className="text-primary-500" size={20} /> Aktivite Geçmişi
+                            </h3>
+                        </div>
+
+                        {/* Add New Activity */}
+                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-8">
+                            <div className="flex flex-col sm:flex-row gap-3 mb-3">
+                                <div className="flex bg-white border border-slate-200 rounded-lg overflow-hidden shrink-0">
+                                    <button onClick={() => setNewActivityType('note')} className={`px-4 py-2 text-xs font-bold transition-colors ${newActivityType === 'note' ? 'bg-primary-50 text-primary-700' : 'text-slate-500 hover:bg-slate-50'}`}>Not</button>
+                                    <button onClick={() => setNewActivityType('call')} className={`px-4 py-2 text-xs font-bold transition-colors border-l border-slate-200 ${newActivityType === 'call' ? 'bg-primary-50 text-primary-700' : 'text-slate-500 hover:bg-slate-50'}`}>Arama</button>
+                                    <button onClick={() => setNewActivityType('email')} className={`px-4 py-2 text-xs font-bold transition-colors border-l border-slate-200 ${newActivityType === 'email' ? 'bg-primary-50 text-primary-700' : 'text-slate-500 hover:bg-slate-50'}`}>E-posta</button>
+                                    <button onClick={() => setNewActivityType('meeting')} className={`px-4 py-2 text-xs font-bold transition-colors border-l border-slate-200 ${newActivityType === 'meeting' ? 'bg-primary-50 text-primary-700' : 'text-slate-500 hover:bg-slate-50'}`}>Toplantı</button>
+                                </div>
                             </div>
-                        )}
+                            <textarea
+                                value={newActivityContent}
+                                onChange={(e) => setNewActivityContent(e.target.value)}
+                                placeholder="Aktivite detayı veya görüşme notu yazın..."
+                                className="w-full min-h-[80px] p-3 text-sm bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-y mb-3"
+                            />
+                            <div className="flex justify-end">
+                                <button
+                                    onClick={handleAddActivity}
+                                    disabled={!newActivityContent.trim()}
+                                    className="flex items-center gap-2 px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white text-sm font-bold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                                >
+                                    <Plus size={16} /> Ekle
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Timeline */}
+                        <div className="relative pl-6 sm:pl-8 border-l-2 border-slate-100 space-y-8">
+                            {activities.length > 0 ? (
+                                activities.map((act) => (
+                                    <div key={act.id} className="relative">
+                                        <div className={`absolute -left-[35px] sm:-left-[43px] w-8 h-8 rounded-full border-4 border-white flex items-center justify-center shadow-sm 
+                                            ${act.type === 'note' ? 'bg-amber-100 text-amber-600' :
+                                                act.type === 'call' ? 'bg-emerald-100 text-emerald-600' :
+                                                    act.type === 'email' ? 'bg-blue-100 text-blue-600' :
+                                                        'bg-purple-100 text-purple-600'}`}
+                                        >
+                                            {act.type === 'note' && <FileText size={12} />}
+                                            {act.type === 'call' && <Phone size={12} />}
+                                            {act.type === 'email' && <Mail size={12} />}
+                                            {act.type === 'meeting' && <User size={12} />}
+                                        </div>
+                                        <div className="bg-white border border-slate-200/60 p-4 rounded-xl shadow-sm">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="text-xs font-bold text-slate-500 uppercase">
+                                                    {act.type === 'note' ? 'Not' : act.type === 'call' ? 'Arama' : act.type === 'email' ? 'E-posta' : 'Toplantı'}
+                                                </span>
+                                                <span className="text-xs font-medium text-slate-400">
+                                                    {new Date(act.date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm text-slate-700 whitespace-pre-wrap">{act.content}</p>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-sm text-slate-400 italic">Henüz bir aktivite girilmemiş.</div>
+                            )}
+
+                            {/* Legacy Notes Backwards comp. */}
+                            {opportunity.notes && activities.length === 0 && (
+                                <div className="relative">
+                                    <div className="absolute -left-[35px] sm:-left-[43px] w-8 h-8 rounded-full bg-slate-200 border-4 border-white flex items-center justify-center shadow-sm text-slate-500">
+                                        <FileText size={12} />
+                                    </div>
+                                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                        <div className="text-xs font-bold text-slate-400 uppercase mb-2">Aktivite Öncesi Alınan Notlar</div>
+                                        <p className="text-sm text-slate-600 whitespace-pre-wrap">{opportunity.notes}</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </section>
 
                 </div>

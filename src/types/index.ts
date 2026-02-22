@@ -12,6 +12,13 @@ export interface ContactPerson {
     phone: string;
 }
 
+export interface Activity {
+    id: string;
+    date: string;
+    content: string;
+    type: 'note' | 'email' | 'call' | 'meeting';
+}
+
 export interface TrainingItem {
     id: string;
     topic: string;
@@ -22,6 +29,13 @@ export interface TrainingItem {
     participantCount?: number;
     assessmentPrice?: number;
     status: 'pending' | 'won' | 'lost';
+    lossReason?: string;
+}
+
+export interface OppTask {
+    id: string;
+    title: string;
+    isCompleted: boolean;
 }
 
 export interface Opportunity {
@@ -34,7 +48,9 @@ export interface Opportunity {
     name: string;
     contact: ContactPerson;
     trainings: TrainingItem[];
+    activities: Activity[];
+    tasks: OppTask[];
     totalAmount: number;
-    notes: string;
+    notes?: string; /* Legacy */
     status: OpportunityStatus;
 }
