@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { LayoutDashboard, Users, Plus, Settings } from 'lucide-react';
+import { useOpportunities } from '../store/OpportunityContext';
 
 interface LayoutProps {
     children: ReactNode;
@@ -7,6 +8,24 @@ interface LayoutProps {
 }
 
 export const Layout = ({ children, onNewOpportunity }: LayoutProps) => {
+    const { opportunities } = useOpportunities();
+
+    const stats = opportunities
+        .filter(opp => opp.status === 'Bitti')
+        .reduce(
+            (acc, opp) => {
+                opp.trainings.forEach(training => {
+                    if (training.status === 'won') {
+                        acc.totalWon += training.amount;
+                    } else if (training.status === 'lost') {
+                        acc.totalLost += training.amount;
+                    }
+                });
+                return acc;
+            },
+            { totalWon: 0, totalLost: 0 }
+        );
+
     return (
         <div className="min-h-screen flex bg-slate-50 text-slate-900 font-sans relative overflow-hidden">
             {/* Background ambient light */}
@@ -56,7 +75,18 @@ export const Layout = ({ children, onNewOpportunity }: LayoutProps) => {
                         <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Fırsat Yönetimi</h2>
                         <p className="text-sm text-slate-500 font-medium">Tüm satış fırsatlarınızı buradan takip edin</p>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-3 bg-white/80 p-1.5 rounded-xl border border-slate-200/60 shadow-sm">
+                            <div className="flex flex-col items-end px-3 py-1 bg-emerald-50 rounded-lg border border-emerald-100/50">
+                                <span className="text-[10px] uppercase font-bold text-emerald-600/70 tracking-wider">Kazanılan</span>
+                                <span className="text-emerald-700 font-bold leading-tight">{stats.totalWon.toLocaleString('tr-TR')} ₺</span>
+                            </div>
+                            <div className="w-px h-8 bg-slate-200/60"></div>
+                            <div className="flex flex-col items-start px-3 py-1 bg-rose-50 rounded-lg border border-rose-100/50">
+                                <span className="text-[10px] uppercase font-bold text-rose-600/70 tracking-wider">Kaybedilen</span>
+                                <span className="text-rose-700 font-bold leading-tight">{stats.totalLost.toLocaleString('tr-TR')} ₺</span>
+                            </div>
+                        </div>
                         <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-slate-200 to-slate-100 flex items-center justify-center text-slate-600 font-bold border-2 border-white shadow-md ring-2 ring-slate-100 cursor-pointer hover:ring-primary-400 transition-all">US</div>
                     </div>
                 </header>

@@ -43,13 +43,13 @@ export const KanbanBoard = () => {
     };
 
     return (
-        <div className="flex gap-6 h-full min-w-max pb-8 px-2 items-start">
+        <div className="flex gap-6 w-full h-full pb-8 px-2 items-start">
             {COLUMNS.map(col => {
                 const colOpps = opportunities.filter(o => o.status === col);
                 return (
                     <div
                         key={col}
-                        className="w-[340px] flex flex-col bg-white/60 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[24px] overflow-hidden"
+                        className="flex-1 min-w-0 flex flex-col bg-white/60 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[24px] overflow-hidden"
                         onDragOver={handleDragOver}
                         onDrop={(e) => handleDrop(e, col)}
                     >
