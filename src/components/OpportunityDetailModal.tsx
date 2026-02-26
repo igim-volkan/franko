@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Opportunity } from '../types';
 import { useOpportunities } from '../store/OpportunityContext';
 import { X, User, Phone, Mail, FileText, Calendar, Building, DollarSign, Printer, Plus, MessageSquare, CheckSquare, Square, Trash2 } from 'lucide-react';
@@ -20,6 +20,17 @@ export const OpportunityDetailModal = ({ opportunity, onClose }: OpportunityDeta
     const [assignee, setAssignee] = useState(opportunity.assignee || '');
     const [activities, setActivities] = useState(opportunity.activities || []);
     const [tasks, setTasks] = useState(opportunity.tasks || []);
+
+    // Handle Escape key to close
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [onClose]);
 
     // New Activity State
     const [newActivityContent, setNewActivityContent] = useState('');
@@ -86,14 +97,21 @@ export const OpportunityDetailModal = ({ opportunity, onClose }: OpportunityDeta
     };
 
     return (
-        <div className="fixed inset-0 z-[60] flex justify-center items-center bg-slate-900/60 backdrop-blur-sm p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
+        <div
+            className="fixed inset-0 z-[60] flex justify-center items-center bg-slate-900/60 backdrop-blur-sm p-4"
+            onClick={onClose}
+        >
+            <div
+                className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200"
+                onClick={(e) => e.stopPropagation()}
+            >
 
                 {/* Header */}
                 <div className="bg-gradient-to-r from-primary-600 to-primary-700 p-6 sm:p-8 text-white relative shrink-0">
                     <button
+                        type="button"
                         onClick={onClose}
-                        className="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+                        className="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
                     >
                         <X size={20} />
                     </button>
