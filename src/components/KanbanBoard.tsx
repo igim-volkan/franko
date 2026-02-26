@@ -181,7 +181,7 @@ export const KanbanBoard = () => {
                                             draggable={col !== 'Bitti'}
                                             onDragStart={(e) => handleDragStart(e, opp.id)}
                                             onClick={() => setViewingOpp(opp)}
-                                            className={`relative bg-white/90 backdrop-blur-sm p-5 rounded-[20px] shadow-[0_4px_12px_rgb(0,0,0,0.03)] border transition-all ${col !== 'Bitti' ? 'cursor-grab active:cursor-grabbing hover:-translate-y-1' : 'opacity-90'} ${isStale ? 'border-rose-300 shadow-[0_4px_12px_rgb(225,29,72,0.1)]' : 'border-white/60 hover:shadow-[0_8px_24px_rgb(0,0,0,0.08)]'}`}
+                                            className={`relative bg-white/90 backdrop-blur-sm p-5 rounded-[20px] shadow-[0_4px_12px_rgb(0,0,0,0.03)] border transition-all ${col !== 'Bitti' ? 'cursor-grab active:cursor-grabbing hover:-translate-y-1' : 'opacity-95 cursor-pointer hover:opacity-100 hover:-translate-y-1'} ${isStale ? 'border-rose-300 shadow-[0_4px_12px_rgb(225,29,72,0.1)]' : 'border-white/60 hover:shadow-[0_8px_24px_rgb(0,0,0,0.08)]'}`}
                                         >
                                             {isStale && (
                                                 <div className="absolute -top-2 -right-2 bg-rose-500 text-white p-1.5 rounded-full shadow-md animate-pulse" title="5 Günden uzun süredir işlem yapılmadı">

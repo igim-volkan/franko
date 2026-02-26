@@ -111,7 +111,7 @@ export const OpportunityDetailModal = ({ opportunity, onClose }: OpportunityDeta
                     <button
                         type="button"
                         onClick={onClose}
-                        className="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
+                        className="absolute top-6 right-6 p-2 bg-red-500 hover:bg-red-600 text-white shadow-md rounded-full transition-colors z-10 cursor-pointer"
                     >
                         <X size={20} />
                     </button>
