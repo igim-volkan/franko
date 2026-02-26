@@ -74,6 +74,8 @@ export const CloseOpportunityModal = ({ opportunity, onClose }: CloseOpportunity
                                         <label className="text-sm font-semibold text-red-800 whitespace-nowrap">Kayıp Nedeni:</label>
                                         <select
                                             required
+                                            onInvalid={e => (e.target as HTMLSelectElement).setCustomValidity('Lütfen bir neden seçin.')}
+                                            onInput={e => (e.target as HTMLSelectElement).setCustomValidity('')}
                                             value={training.lossReason || ''}
                                             onChange={e => handleReasonChange(training.id, e.target.value)}
                                             className="w-full sm:w-2/3 px-3 py-2 text-sm bg-white border border-red-200 rounded-lg focus:ring-2 focus:ring-red-400 outline-none text-slate-700 font-medium"

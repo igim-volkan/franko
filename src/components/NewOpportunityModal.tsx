@@ -104,18 +104,18 @@ export const NewOpportunityModal = ({ onClose }: NewOpportunityModalProps) => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
                                 <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Müşteri Adı</label>
-                                <input required type="text" value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Örn: Acme Corp" />
+                                <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen bu alanı doldurun.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="text" value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Örn: Acme Corp" />
                             </div>
                             <div>
                                 <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Fırsat Adı</label>
-                                <input required type="text" value={name} onChange={e => setName(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Örn: 2026 Liderlik Eğitimi" />
+                                <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen bu alanı doldurun.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="text" value={name} onChange={e => setName(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Örn: 2026 Liderlik Eğitimi" />
                             </div>
                             <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-5 mt-2">
                                 <div>
                                     <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Oluşturma Tarihi</label>
                                     <div className="relative">
                                         <Calendar className="absolute left-4 top-3.5 text-slate-400" size={18} />
-                                        <input required type="date" value={createdAt} onChange={e => setCreatedAt(e.target.value)} className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" />
+                                        <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen bir tarih seçin.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="date" value={createdAt} onChange={e => setCreatedAt(e.target.value)} className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" />
                                     </div>
                                 </div>
                                 <div>
@@ -127,7 +127,7 @@ export const NewOpportunityModal = ({ onClose }: NewOpportunityModalProps) => {
                                 </div>
                                 <div>
                                     <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Sorumlu Kişi</label>
-                                    <select value={assignee} onChange={e => setAssignee(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none cursor-pointer">
+                                    <select required onInvalid={e => (e.target as HTMLSelectElement).setCustomValidity('Lütfen listeden bir kişi seçin.')} onInput={e => (e.target as HTMLSelectElement).setCustomValidity('')} value={assignee} onChange={e => setAssignee(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none cursor-pointer">
                                         <option value="">Seçiniz...</option>
                                         <option value="Uğur Şahin">Uğur Şahin</option>
                                         <option value="Volkan Ekşi">Volkan Ekşi</option>
@@ -146,24 +146,24 @@ export const NewOpportunityModal = ({ onClose }: NewOpportunityModalProps) => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
                                 <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Ad</label>
-                                <input required type="text" value={contact.firstName} onChange={e => setContact({ ...contact, firstName: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Ad" />
+                                <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen bu alanı doldurun.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="text" value={contact.firstName} onChange={e => setContact({ ...contact, firstName: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Ad" />
                             </div>
                             <div>
                                 <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Soyad</label>
-                                <input required type="text" value={contact.lastName} onChange={e => setContact({ ...contact, lastName: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Soyad" />
+                                <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen bu alanı doldurun.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="text" value={contact.lastName} onChange={e => setContact({ ...contact, lastName: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Soyad" />
                             </div>
                             <div>
                                 <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">E-mail</label>
                                 <div className="relative">
                                     <Mail className="absolute left-4 top-3.5 text-slate-400" size={18} />
-                                    <input required type="email" value={contact.email} onChange={e => setContact({ ...contact, email: e.target.value })} className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="ornek@sirket.com" />
+                                    <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen geçerli bir e-posta adresi girin.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="email" value={contact.email} onChange={e => setContact({ ...contact, email: e.target.value })} className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="ornek@sirket.com" />
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Telefon</label>
                                 <div className="relative">
                                     <Phone className="absolute left-4 top-3.5 text-slate-400" size={18} />
-                                    <input required type="tel" value={contact.phone} onChange={e => setContact({ ...contact, phone: e.target.value })} className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="05XX XXX XX XX" />
+                                    <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen bu alanı doldurun.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="tel" value={contact.phone} onChange={e => setContact({ ...contact, phone: e.target.value })} className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="05XX XXX XX XX" />
                                 </div>
                             </div>
                         </div>
@@ -194,7 +194,7 @@ export const NewOpportunityModal = ({ onClose }: NewOpportunityModalProps) => {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pr-10">
                                             <div>
                                                 <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Konu</label>
-                                                <select required value={training.topic} onChange={e => updateTraining(index, 'topic', e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none cursor-pointer">
+                                                <select required onInvalid={e => (e.target as HTMLSelectElement).setCustomValidity('Lütfen bir konu seçin.')} onInput={e => (e.target as HTMLSelectElement).setCustomValidity('')} value={training.topic} onChange={e => updateTraining(index, 'topic', e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none cursor-pointer">
                                                     <option value="">Seçiniz...</option>
                                                     <option value="Liderlik">Liderlik</option>
                                                     <option value="Satış">Satış</option>
@@ -205,7 +205,7 @@ export const NewOpportunityModal = ({ onClose }: NewOpportunityModalProps) => {
                                             </div>
                                             <div>
                                                 <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Eğitim Türü</label>
-                                                <select required value={training.type} onChange={e => updateTraining(index, 'type', e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none cursor-pointer">
+                                                <select required onInvalid={e => (e.target as HTMLSelectElement).setCustomValidity('Lütfen eğitim türünü seçin.')} onInput={e => (e.target as HTMLSelectElement).setCustomValidity('')} value={training.type} onChange={e => updateTraining(index, 'type', e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none cursor-pointer">
                                                     <option value="">Seçiniz...</option>
                                                     <option value="Sınıf İçi">Sınıf İçi</option>
                                                     <option value="Online">Online</option>
@@ -214,11 +214,11 @@ export const NewOpportunityModal = ({ onClose }: NewOpportunityModalProps) => {
                                             </div>
                                             <div>
                                                 <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Tutar (₺)</label>
-                                                <input required type="number" min="0" value={training.amount || ''} onChange={e => updateTraining(index, 'amount', Number(e.target.value))} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="0" />
+                                                <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen tutar girin.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="number" min="0" value={training.amount || ''} onChange={e => updateTraining(index, 'amount', Number(e.target.value))} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="0" />
                                             </div>
                                             <div>
                                                 <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Süre</label>
-                                                <input required type="text" value={training.duration} onChange={e => updateTraining(index, 'duration', e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Örn: 2 Gün" />
+                                                <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen süreyi girin.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="text" value={training.duration} onChange={e => updateTraining(index, 'duration', e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Örn: 2 Gün" />
                                             </div>
 
                                             <div className="md:col-span-2 mt-3 pt-5 border-t border-slate-100">
@@ -234,11 +234,11 @@ export const NewOpportunityModal = ({ onClose }: NewOpportunityModalProps) => {
                                                     <div className="grid grid-cols-2 gap-5 mt-5 bg-primary-50/50 p-4 rounded-xl border border-primary-100/50 animate-in slide-in-from-top-2 duration-200">
                                                         <div>
                                                             <label className="block text-xs font-bold text-primary-700/70 mb-1.5 uppercase tracking-wide">Kişi Sayısı</label>
-                                                            <input required type="number" min="1" value={training.participantCount || ''} onChange={e => updateTraining(index, 'participantCount', Number(e.target.value))} className="w-full px-3 py-2 text-sm bg-white border border-primary-200/50 rounded-lg focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Örn: 15" />
+                                                            <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen kişi sayısını girin.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="number" min="1" value={training.participantCount || ''} onChange={e => updateTraining(index, 'participantCount', Number(e.target.value))} className="w-full px-3 py-2 text-sm bg-white border border-primary-200/50 rounded-lg focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Örn: 15" />
                                                         </div>
                                                         <div>
                                                             <label className="block text-xs font-bold text-primary-700/70 mb-1.5 uppercase tracking-wide">Kişi Başı Fiyat (₺)</label>
-                                                            <input required type="number" min="0" value={training.assessmentPrice || ''} onChange={e => updateTraining(index, 'assessmentPrice', Number(e.target.value))} className="w-full px-3 py-2 text-sm bg-white border border-primary-200/50 rounded-lg focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Örn: 500" />
+                                                            <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen kişi başı fiyatı girin.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="number" min="0" value={training.assessmentPrice || ''} onChange={e => updateTraining(index, 'assessmentPrice', Number(e.target.value))} className="w-full px-3 py-2 text-sm bg-white border border-primary-200/50 rounded-lg focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Örn: 500" />
                                                         </div>
                                                     </div>
                                                 )}
