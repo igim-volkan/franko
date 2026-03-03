@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useOpportunities } from '../store/OpportunityContext';
 import { useCustomers } from '../store/CustomerContext';
 import { AddCustomerModal } from './AddCustomerModal';
-import { Building, Phone, Mail, Trophy, AlertCircle, Clock, Users, UserCheck, UserPlus, Filter, PieChart, TrendingUp, Calendar as CalendarIcon } from 'lucide-react';
+import { Building, Phone, Mail, Trophy, AlertCircle, Clock, Users, UserCheck, UserPlus, Filter, PieChart, TrendingUp } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { isThisMonth, parseISO } from 'date-fns';
