@@ -10,6 +10,7 @@ export interface ContactPerson {
     lastName: string;
     email: string;
     phone: string;
+    industry?: string;
 }
 
 export interface Activity {
@@ -53,4 +54,21 @@ export interface Opportunity {
     totalAmount: number;
     notes?: string; /* Legacy */
     status: OpportunityStatus;
+}
+
+export interface Customer {
+    id: string;
+    companyName: string;
+    representative?: string;
+    contactName?: string;
+    industry?: string;
+    email?: string;
+    phone?: string;
+    employeeCount?: string;
+    address?: string;
+    billingAddress?: string;
+    taxOffice?: string;
+    taxNumber?: string;
+    type: 'potential' | 'existing';
+    createdAt: string;
 }

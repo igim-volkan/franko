@@ -19,7 +19,7 @@ export const NewOpportunityModal = ({ onClose }: NewOpportunityModalProps) => {
     const [name, setName] = useState('');
 
     // Contact
-    const [contact, setContact] = useState({ firstName: '', lastName: '', email: '', phone: '' });
+    const [contact, setContact] = useState({ firstName: '', lastName: '', email: '', phone: '', industry: '' });
 
     // Trainings
     const [trainings, setTrainings] = useState<Omit<TrainingItem, 'id' | 'status'>[]>([]);
@@ -165,6 +165,20 @@ export const NewOpportunityModal = ({ onClose }: NewOpportunityModalProps) => {
                                     <Phone className="absolute left-4 top-3.5 text-slate-400" size={18} />
                                     <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen bu alanı doldurun.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="tel" value={contact.phone} onChange={e => setContact({ ...contact, phone: e.target.value })} className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="05XX XXX XX XX" />
                                 </div>
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Sektör</label>
+                                <select required onInvalid={e => (e.target as HTMLSelectElement).setCustomValidity('Lütfen sektör seçin.')} onInput={e => (e.target as HTMLSelectElement).setCustomValidity('')} value={contact.industry || ''} onChange={e => setContact({ ...contact, industry: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none cursor-pointer">
+                                    <option value="">Seçiniz...</option>
+                                    <option value="Teknoloji">Teknoloji</option>
+                                    <option value="Finans">Finans</option>
+                                    <option value="Sağlık">Sağlık</option>
+                                    <option value="Üretim">Üretim</option>
+                                    <option value="Perakende">Perakende</option>
+                                    <option value="Hizmet">Hizmet</option>
+                                    <option value="Eğitim">Eğitim</option>
+                                    <option value="Diğer">Diğer</option>
+                                </select>
                             </div>
                         </div>
                     </section>

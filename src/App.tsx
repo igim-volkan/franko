@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { OpportunityProvider, useOpportunities } from './store/OpportunityContext';
+import { CustomerProvider } from './store/CustomerContext';
 import { Layout } from './components/Layout';
 import { KanbanBoard } from './components/KanbanBoard';
 import { CustomerDirectory } from './components/CustomerDirectory';
@@ -52,8 +53,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <OpportunityProvider>
-      <AppContent />
-    </OpportunityProvider>
+    <CustomerProvider>
+      <OpportunityProvider>
+        <AppContent />
+      </OpportunityProvider>
+    </CustomerProvider>
   );
 }
