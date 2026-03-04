@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useOpportunities } from '../store/OpportunityContext';
+import { useCustomers } from '../store/CustomerContext';
 import type { Opportunity, TrainingItem } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { X, Plus, Trash2, Calendar, User, Phone, Mail, Building, FileText } from 'lucide-react';
@@ -10,6 +11,7 @@ interface NewOpportunityModalProps {
 
 export const NewOpportunityModal = ({ onClose }: NewOpportunityModalProps) => {
     const { addOpportunity } = useOpportunities();
+    const { customers } = useCustomers();
 
     // General
     const [customerName, setCustomerName] = useState('');
@@ -104,7 +106,14 @@ export const NewOpportunityModal = ({ onClose }: NewOpportunityModalProps) => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
                                 <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Müşteri Adı</label>
-                                <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen bu alanı doldurun.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="text" value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Örn: Acme Corp" />
+                                <select required onInvalid={e => (e.target as HTMLSelectElement).setCustomValidity('Lütfen bir müşteri seçin.')} onInput={e => (e.target as HTMLSelectElement).setCustomValidity('')} value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none cursor-pointer">
+                                    <option value="">Seçiniz...</option>
+                                    {customers.map(c => (
+                                        <option key={c.id} value={c.companyName}>
+                                            {c.companyName} ({c.type === 'existing' ? 'Mevcut' : 'Potansiyel'})
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div>
                                 <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Fırsat Adı</label>
