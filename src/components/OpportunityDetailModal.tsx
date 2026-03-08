@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import type { Opportunity } from '../types';
+import { useState, useEffect, useMemo } from 'react';
+import type { Opportunity, TrainingItem } from '../types';
 import { useOpportunities } from '../store/OpportunityContext';
 import { X, User, Phone, Mail, FileText, Calendar, Building, DollarSign, Printer, Plus, MessageSquare, CheckSquare, Square, Trash2 } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
@@ -20,6 +20,41 @@ export const OpportunityDetailModal = ({ opportunity, onClose }: OpportunityDeta
     const [assignee, setAssignee] = useState(opportunity.assignee || '');
     const [activities, setActivities] = useState(opportunity.activities || []);
     const [tasks, setTasks] = useState(opportunity.tasks || []);
+    const [trainings, setTrainings] = useState<TrainingItem[]>(opportunity.trainings || []);
+
+    const totalAmount = useMemo(() => {
+        return trainings.reduce((sum, t) => {
+            let tSum = Number(t.amount) || 0;
+            if (t.hasAssessment) {
+                tSum += (Number(t.participantCount) || 0) * (Number(t.assessmentPrice) || 0);
+            }
+            if (t.hasKit) {
+                tSum += (Number(t.kitCount) || 0) * (Number(t.kitPrice) || 0);
+            }
+            return sum + tSum;
+        }, 0);
+    }, [trainings]);
+
+    const handleAddTraining = () => {
+        setTrainings(prev => [...prev, {
+            id: uuidv4(),
+            topic: '',
+            type: '',
+            amount: 0,
+            duration: '',
+            hasAssessment: false,
+            hasKit: false,
+            status: 'pending' as const
+        }]);
+    };
+
+    const updateTraining = (id: string, field: keyof TrainingItem, value: any) => {
+        setTrainings(prev => prev.map(t => t.id === id ? { ...t, [field]: value } : t));
+    };
+
+    const removeTraining = (id: string) => {
+        setTrainings(prev => prev.filter(t => t.id !== id));
+    };
 
     // Handle Escape key to close
     useEffect(() => {
@@ -46,7 +81,9 @@ export const OpportunityDetailModal = ({ opportunity, onClose }: OpportunityDeta
             targetCloseDate,
             assignee,
             activities,
-            tasks
+            tasks,
+            trainings,
+            totalAmount
         });
         setIsEditing(false);
     };
@@ -247,24 +284,127 @@ export const OpportunityDetailModal = ({ opportunity, onClose }: OpportunityDeta
                     </section>
 
                     {/* Trainings */}
-                    <section className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                            Eğitimler ({opportunity.trainings.length})
-                        </h3>
-                        <div className="space-y-3">
-                            {opportunity.trainings.map(t => (
-                                <div key={t.id} className="flex justify-between items-center p-3 border border-slate-100 rounded-xl bg-slate-50">
-                                    <div>
-                                        <p className="font-semibold text-slate-800">{t.topic}</p>
-                                        <p className="text-xs text-slate-500">{t.type} • {t.duration} {t.participantCount ? `• ${t.participantCount} Kişi` : ''}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="font-bold text-primary-700">{t.amount.toLocaleString('tr-TR')} ₺</p>
-                                        {t.hasAssessment && <p className="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md inline-block mt-1">Envanter Dahil</p>}
-                                    </div>
-                                </div>
-                            ))}
+                    <section className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm transition-all duration-300">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                Eğitimler ({trainings.length})
+                            </h3>
+                            {isEditing && (
+                                <button type="button" onClick={handleAddTraining} className="text-sm bg-primary-50 text-primary-700 font-bold px-4 py-2 rounded-xl border border-primary-200/50 hover:bg-primary-100 hover:shadow-sm flex items-center gap-1.5 transition-all cursor-pointer">
+                                    <Plus size={18} /> Eğitim Ekle
+                                </button>
+                            )}
                         </div>
+
+                        {isEditing ? (
+                            <div className="space-y-6">
+                                {trainings.map((training) => (
+                                    <div key={training.id} className="bg-white p-6 rounded-[20px] shadow-sm border border-slate-200/70 relative transition-all hover:shadow-md">
+                                        <button type="button" onClick={() => removeTraining(training.id)} className="absolute top-5 right-5 text-slate-400 hover:text-red-500 bg-slate-50 hover:bg-red-50 p-2 rounded-full transition-colors cursor-pointer">
+                                            <Trash2 size={18} />
+                                        </button>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pr-10">
+                                            <div>
+                                                <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Konu</label>
+                                                <select required onInvalid={e => (e.target as HTMLSelectElement).setCustomValidity('Lütfen bir konu seçin.')} onInput={e => (e.target as HTMLSelectElement).setCustomValidity('')} value={training.topic} onChange={e => updateTraining(training.id, 'topic', e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none cursor-pointer">
+                                                    <option value="">Seçiniz...</option>
+                                                    <option value="Liderlik">Liderlik</option>
+                                                    <option value="Satış">Satış</option>
+                                                    <option value="İletişim">İletişim</option>
+                                                    <option value="Takım Çalışması">Takım Çalışması</option>
+                                                    <option value="Diğer">Diğer</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Eğitim Türü</label>
+                                                <select required onInvalid={e => (e.target as HTMLSelectElement).setCustomValidity('Lütfen eğitim türünü seçin.')} onInput={e => (e.target as HTMLSelectElement).setCustomValidity('')} value={training.type} onChange={e => updateTraining(training.id, 'type', e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none cursor-pointer">
+                                                    <option value="">Seçiniz...</option>
+                                                    <option value="Sınıf İçi">Sınıf İçi</option>
+                                                    <option value="Online">Online</option>
+                                                    <option value="Karma">Karma (Hibrit)</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Tutar (₺)</label>
+                                                <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen tutar girin.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="number" min="0" value={training.amount || ''} onChange={e => updateTraining(training.id, 'amount', Number(e.target.value))} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="0" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[13px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Süre</label>
+                                                <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen süreyi girin.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="text" value={training.duration} onChange={e => updateTraining(training.id, 'duration', e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Örn: 2 Gün" />
+                                            </div>
+
+                                            <div className="md:col-span-2 mt-3 pt-5 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-5">
+                                                {/* Assessment */}
+                                                <div>
+                                                    <label className="flex items-center gap-3 text-sm font-bold text-slate-700 cursor-pointer select-none">
+                                                        <div className="relative flex items-center">
+                                                            <input type="checkbox" checked={training.hasAssessment} onChange={e => updateTraining(training.id, 'hasAssessment', e.target.checked)} className="peer sr-only" />
+                                                            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
+                                                        </div>
+                                                        Assessment Seçeneği Ekle
+                                                    </label>
+
+                                                    {training.hasAssessment && (
+                                                        <div className="grid grid-cols-2 gap-3 mt-4 bg-primary-50/50 p-4 rounded-xl border border-primary-100/50 animate-in slide-in-from-top-2 duration-200">
+                                                            <div>
+                                                                <label className="block text-xs font-bold text-primary-700/70 mb-1.5 uppercase tracking-wide">Kişi Sayısı</label>
+                                                                <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen kişi sayısını girin.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="number" min="1" value={training.participantCount || ''} onChange={e => updateTraining(training.id, 'participantCount', Number(e.target.value))} className="w-full px-3 py-2 text-sm bg-white border border-primary-200/50 rounded-lg focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Örn: 15" />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-xs font-bold text-primary-700/70 mb-1.5 uppercase tracking-wide">Birim Fiyat (₺)</label>
+                                                                <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen birim fiyatı girin.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="number" min="0" value={training.assessmentPrice || ''} onChange={e => updateTraining(training.id, 'assessmentPrice', Number(e.target.value))} className="w-full px-3 py-2 text-sm bg-white border border-primary-200/50 rounded-lg focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none" placeholder="Örn: 500" />
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Kit */}
+                                                <div>
+                                                    <label className="flex items-center gap-3 text-sm font-bold text-slate-700 cursor-pointer select-none">
+                                                        <div className="relative flex items-center">
+                                                            <input type="checkbox" checked={training.hasKit || false} onChange={e => updateTraining(training.id, 'hasKit', e.target.checked)} className="peer sr-only" />
+                                                            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-500"></div>
+                                                        </div>
+                                                        Kit Seçeneği Ekle
+                                                    </label>
+
+                                                    {training.hasKit && (
+                                                        <div className="grid grid-cols-2 gap-3 mt-4 bg-purple-50/50 p-4 rounded-xl border border-purple-100/50 animate-in slide-in-from-top-2 duration-200">
+                                                            <div>
+                                                                <label className="block text-xs font-bold text-purple-700/70 mb-1.5 uppercase tracking-wide">Kişi/Adet Sayısı</label>
+                                                                <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen kişi/adet sayısını girin.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="number" min="1" value={training.kitCount || ''} onChange={e => updateTraining(training.id, 'kitCount', Number(e.target.value))} className="w-full px-3 py-2 text-sm bg-white border border-purple-200/50 rounded-lg focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all duration-300 outline-none" placeholder="Örn: 15" />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-xs font-bold text-purple-700/70 mb-1.5 uppercase tracking-wide">Birim Fiyat (₺)</label>
+                                                                <input required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Lütfen birim fiyatı girin.')} onInput={e => (e.target as HTMLInputElement).setCustomValidity('')} type="number" min="0" value={training.kitPrice || ''} onChange={e => updateTraining(training.id, 'kitPrice', Number(e.target.value))} className="w-full px-3 py-2 text-sm bg-white border border-purple-200/50 rounded-lg focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all duration-300 outline-none" placeholder="Örn: 800" />
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {trainings.map(t => (
+                                    <div key={t.id} className="flex justify-between items-center p-3 border border-slate-100 rounded-xl bg-slate-50">
+                                        <div>
+                                            <p className="font-semibold text-slate-800">{t.topic}</p>
+                                            <p className="text-xs text-slate-500">{t.type} • {t.duration} {t.participantCount ? `• ${t.participantCount} Kişi` : ''}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="font-bold text-primary-700">{t.amount.toLocaleString('tr-TR')} ₺</p>
+                                            <div className="flex gap-1 justify-end mt-1">
+                                                {t.hasAssessment && <span className="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md inline-block">Assessment Dahil</span>}
+                                                {t.hasKit && <span className="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-md inline-block">Kit Dahil</span>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </section>
 
                     {/* Tasks (Yapılacaklar) */}
@@ -403,6 +543,7 @@ export const OpportunityDetailModal = ({ opportunity, onClose }: OpportunityDeta
                             setContact(opportunity.contact);
                             setTargetCloseDate(opportunity.targetCloseDate || '');
                             setAssignee(opportunity.assignee || '');
+                            setTrainings(opportunity.trainings || []);
                         }} className="px-6 py-2.5 rounded-xl font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors">İptal</button>
                         <button onClick={handleSave} className="px-8 py-2.5 rounded-xl font-bold text-white bg-primary-600 hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/30">Değişiklikleri Kaydet</button>
                     </div>

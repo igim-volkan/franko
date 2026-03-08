@@ -27,8 +27,11 @@ export interface TrainingItem {
     amount: number;
     duration: string;
     hasAssessment: boolean;
+    hasKit?: boolean;
     participantCount?: number;
     assessmentPrice?: number;
+    kitCount?: number;
+    kitPrice?: number;
     status: 'pending' | 'won' | 'lost';
     lossReason?: string;
 }
