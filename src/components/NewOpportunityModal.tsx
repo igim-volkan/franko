@@ -50,18 +50,22 @@ export const NewOpportunityModal = ({ onClose }: NewOpportunityModalProps) => {
         setTrainings(prev => prev.filter((_, i) => i !== index));
     };
 
-    const totalAmount = useMemo(() => {
-        return trainings.reduce((sum, t) => {
-            let tSum = Number(t.amount) || 0;
-            if (t.hasAssessment) {
-                tSum += (Number(t.participantCount) || 0) * (Number(t.assessmentPrice) || 0);
-            }
-            if (t.hasKit) {
-                tSum += (Number(t.kitCount) || 0) * (Number(t.kitPrice) || 0);
-            }
-            return sum + tSum;
-        }, 0);
+    const totals = useMemo(() => {
+        return trainings.reduce((acc, t) => {
+            const trainingAmount = Number(t.amount) || 0;
+            const assessmentAmount = t.hasAssessment ? (Number(t.participantCount) || 0) * (Number(t.assessmentPrice) || 0) : 0;
+            const kitAmount = t.hasKit ? (Number(t.kitCount) || 0) * (Number(t.kitPrice) || 0) : 0;
+
+            return {
+                training: acc.training + trainingAmount,
+                assessment: acc.assessment + assessmentAmount,
+                kit: acc.kit + kitAmount,
+                total: acc.total + trainingAmount + assessmentAmount + kitAmount
+            };
+        }, { training: 0, assessment: 0, kit: 0, total: 0 });
     }, [trainings]);
+
+    const totalAmount = totals.total;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -306,13 +310,34 @@ export const NewOpportunityModal = ({ onClose }: NewOpportunityModalProps) => {
 
                     {/* Summary */}
                     <section className="bg-slate-100/50 p-6 rounded-[20px] border border-slate-200/60">
-                        <div className="mb-5">
+                        <div className="mb-6">
                             <label className="block text-[13px] font-semibold text-slate-500 mb-2 uppercase tracking-wide">Notlar</label>
                             <textarea rows={3} value={notes} onChange={e => setNotes(e.target.value)} className="w-full px-4 py-3 bg-white border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 outline-none resize-none" placeholder="Fırsat ile ilgili eklemek istedikleriniz..."></textarea>
                         </div>
 
+                        <div className="space-y-3 mb-6">
+                            <div className="flex justify-between items-center text-slate-600">
+                                <span className="text-sm font-medium">Toplam Eğitim Tutarı:</span>
+                                <span className="font-semibold">{totals.training.toLocaleString('tr-TR')} ₺</span>
+                            </div>
+
+                            {totals.assessment > 0 && (
+                                <div className="flex justify-between items-center text-slate-600">
+                                    <span className="text-sm font-medium">Toplam Assessment Tutarı:</span>
+                                    <span className="font-semibold">{totals.assessment.toLocaleString('tr-TR')} ₺</span>
+                                </div>
+                            )}
+
+                            {totals.kit > 0 && (
+                                <div className="flex justify-between items-center text-slate-600">
+                                    <span className="text-sm font-medium">Toplam Kit Tutarı:</span>
+                                    <span className="font-semibold">{totals.kit.toLocaleString('tr-TR')} ₺</span>
+                                </div>
+                            )}
+                        </div>
+
                         <div className="flex justify-between items-center pt-5 border-t border-slate-200/80">
-                            <span className="text-lg font-bold text-slate-600">Genel Toplam:</span>
+                            <span className="text-lg font-bold text-slate-700">Genel Toplam:</span>
                             <span className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-accent-600 tracking-tight">
                                 {totalAmount.toLocaleString('tr-TR')} ₺
                             </span>
